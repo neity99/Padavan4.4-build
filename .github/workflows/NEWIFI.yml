@@ -19,7 +19,13 @@ on:
   #    - cron: 0 8 * * 5
   #watch:
   #  types: [started]
-
+env:
+  REPOSITORY_URL: https://gitlab.com/dm38/padavan-ng.git
+  TOOLCHAIN_URL: https://github.com/hanwckf/padavan-toolchain/releases/download/v1.1/mipsel-linux-uclibc.tar.xz
+  WORK_PATH: /opt/rt-n56u
+  TIME_ZONE: Asia/Shanghai
+  FIRMWARE_AUTHOR: hanwckf
+  FIRMWARE_PATH: /opt/firmwares
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -38,15 +44,22 @@ jobs:
         pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
     - name: Clone source code
       run: |
-        git clone --depth=1 https://gitlab.com/dm38/padavan-ng.git /opt/rt-n56u
-        cd /opt/rt-n56u/toolchain-mipsel
-        sh dl_toolchain.sh
-        mkdir -p /opt/images/
+        git clone --depth=1 $REPOSITORY_URL $WORK_PATH
+        cd $WORK_PATH/toolchain-mipsel
+        mkdir -p toolchain-3.4.x
+        wget $TOOLCHAIN_URL
+        tar -xvf mipsel-linux-uclibc.tar.xz -C toolchain-3.4.x
+    - name: Set environment variables
+      run: |
+        git config --global log.date format:'%Y%m%d'
+        cd $WORK_PATH
+        echo "FIRMWARE_VERSION=$(git log -1 --pretty=format:"%cd")" >> $GITHUB_ENV
+        echo "FIRMWARE_DATEPREFIX=$(date +"%Y%m%d")" >> $GITHUB_ENV
     - name: Build Firmware
       env:
         TNAME: NEWIFI3
       run: |
-        cd /opt/rt-n56u/trunk
+        cd $WORK_PATH/trunk
         if [ ! -f configs/templates/$TNAME.config ] ; then
         echo "configs/templates/$TNAME.config not found "
         exit 1
