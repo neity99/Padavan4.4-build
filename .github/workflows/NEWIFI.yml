@@ -1,5 +1,5 @@
-#修改TNAME: B70中的B70为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
-name: Build B70  Padavan4.4
+#修改TNAME: NEWIFI3中的B70为你需要编译的型号，注意名称要与configs/templates/目录下的名字相同
+name: Build NEWIFI3 Padavan4.4
 
 on:
   workflow_dispatch:
@@ -38,13 +38,13 @@ jobs:
         pkg-config zlib1g-dev libgmp3-dev libmpc-dev libmpfr-dev libncurses5-dev libltdl-dev wget
     - name: Clone source code
       run: |
-        git clone --depth=1 https://github.com/hy5528/padavan-4.4.git /opt/rt-n56u
+        git clone --depth=1 https://github.com/keke1023/Padavan /opt/rt-n56u
         cd /opt/rt-n56u/toolchain-mipsel
         sh dl_toolchain.sh
         mkdir -p /opt/images/
     - name: Build Firmware
       env:
-        TNAME: NEWIFI
+        TNAME: NEWIFI3
       run: |
         cd /opt/rt-n56u/trunk
         if [ ! -f configs/templates/$TNAME.config ] ; then
@@ -104,5 +104,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: always()
       with:
-        name: Padavan-B70
+        name: Padavan-NEWIFI3
         path: /opt/images
